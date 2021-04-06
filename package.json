@@ -1,0 +1,25 @@
+{
+  "name": "fengen",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "postcss --config postcss.config.js -o dist/css/main.css assets/css/*.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imsekun/fengen.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/imsekun/fengen/issues"
+  },
+  "homepage": "https://github.com/imsekun/fengen#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.2.5",
+    "postcss": "^8.2.13",
+    "postcss-cli": "^8.3.1",
+    "tailwindcss": "^2.1.2"
+  }
+}
