@@ -1,0 +1,19 @@
+# FENGEN
+
+## Dataset
+
+Before you begin, ensure that you've download the chess positions dataset from 
+[Kaggle](https://www.kaggle.com/koryakinp/chess-positions). Extract it to
+`waffle/notebook/dataset`.
+
+## Dependencies
+
+These are the dependencies needed for `fen_gen`'s model. `axon`
+
+```elixir
+Mix.install([
+  {:axon, "~> 0.1.0-dev", github: "elixir-nx/axon", branch: "main"},
+  {:exla, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "exla", override: true},
+  {:nx, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "nx", override: true}
+])
+```
