@@ -1,11 +1,12 @@
 module.exports = {
-  // mode: 'jit',
   purge: [
-    './index.html',
-    './src/*.js',
-    './assets/sass/*.scss'
+    '../lib/**/*.ex',
+    '../lib/**/*.leex',
+    '../lib/**/*.eex',
+    '../lib/**/*.sface',
+    './js/**/*.js'
   ],
-  darkMode: 'class', // or 'media' or 'class'
+  darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
       fontFamily: theme => ({
