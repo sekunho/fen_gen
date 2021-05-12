@@ -52,7 +52,8 @@ config :fen_gen, FenGenWeb.Endpoint,
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/fen_gen_web/(live|views)/.*(ex)$",
-      ~r"lib/fen_gen_web/templates/.*(eex)$"
+      ~r"lib/fen_gen_web/templates/.*(eex)$",
+      ~r"lib/fen_gen_web/live/.*(sface)$",
     ]
   ]
 
