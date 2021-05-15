@@ -1,0 +1,14 @@
+/* A set of reusable classes */
+
+.bg-editor {
+  background-color: #282c34;
+}
+
+.text-editor {
+  color: #abb2bf;
+}
+
+.font-editor {
+  font-family: "JetBrains Mono", "Droid Sans Mono", "monospace";
+  font-size: 14px;
+}

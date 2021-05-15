@@ -1,0 +1,114 @@
+/*
+Conditional elements display.
+
+Verious hooks and callbacks dynamically set attributes
+based on which we hide/show certain elements.
+This way we don't have to engage the server in
+solely client-side operations.
+*/
+
+/* === Global === */
+
+[data-element="menu"]:not([data-js-open]) > [data-content] {
+  @apply hidden;
+}
+
+/* === Session === */
+
+[data-element="session"]:not([data-js-insert-mode])
+  [data-element="insert-mode-indicator"] {
+  @apply invisible;
+}
+
+[data-element="session"]
+  [data-element="cell"][data-type="markdown"]
+  [data-element="editor-box"] {
+  @apply hidden;
+}
+
+[data-element="session"][data-js-insert-mode]
+  [data-element="cell"][data-type="markdown"][data-js-focused]
+  [data-element="editor-box"] {
+  @apply block;
+}
+
+[data-element="session"][data-js-insert-mode]
+  [data-element="cell"][data-type="markdown"][data-js-focused]
+  [data-element="enable-insert-mode-button"] {
+  @apply hidden;
+}
+
+[data-element="session"]:not([data-js-insert-mode])
+  [data-element="cell"][data-type="markdown"][data-js-focused]
+  [data-element="insert-image-button"] {
+  @apply hidden;
+}
+
+[data-element="cell"][data-js-focused] {
+  @apply border-blue-300 border-opacity-100;
+}
+
+[data-element="cell"]:not([data-js-focused])
+  [data-element="actions"]:not(:focus-within) {
+  /* Note: using opacity, so the buttons are focusable (via tab navigation)
+     and when focused we show the actions back. */
+  @apply opacity-0 pointer-events-none;
+}
+
+[data-element="cell"]:not([data-js-focused]):hover
+  [data-element="actions"][data-primary] {
+  @apply opacity-100 pointer-events-auto;
+}
+
+[data-element="sections-list-item"][data-js-is-viewed] {
+  @apply text-gray-900;
+}
+
+[data-element="cell"]:not([data-js-focused]):hover
+  [data-element="cell-focus-indicator"] {
+  @apply bg-blue-200;
+}
+
+[data-element="cell"][data-js-focused] [data-element="cell-focus-indicator"] {
+  @apply bg-blue-300;
+}
+
+[data-element="session"]:not([data-js-side-panel-content])
+  [data-element="side-panel"] {
+  @apply hidden;
+}
+
+[data-element="session"]:not([data-js-side-panel-content="sections-list"])
+  [data-element="sections-list"] {
+  @apply hidden;
+}
+
+[data-element="session"]:not([data-js-side-panel-content="clients-list"])
+  [data-element="clients-list"] {
+  @apply hidden;
+}
+
+[data-element="session"][data-js-side-panel-content="sections-list"]
+  [data-element="sections-list-toggle"] {
+  @apply text-gray-50 bg-gray-700;
+}
+
+[data-element="session"][data-js-side-panel-content="clients-list"]
+  [data-element="clients-list-toggle"] {
+  @apply text-gray-50 bg-gray-700;
+}
+
+[data-element="section-headline"]:not(:hover)
+  [data-element="section-name"]:not(:focus)
+  + [data-element="section-actions"] {
+  @apply hidden;
+}
+
+[data-element="clients-list-item"]:not([data-js-followed])
+  [data-meta="unfollow"] {
+  @apply hidden;
+}
+
+[data-element="clients-list-item"][data-js-followed] [data-meta="follow"] {
+  @apply hidden;
+}

@@ -1,0 +1,144 @@
+/* Markdown rendered content */
+
+.markdown {
+  @apply text-gray-700;
+}
+
+.markdown h1 {
+  @apply text-gray-800 font-semibold text-3xl my-4;
+}
+
+.markdown h2 {
+  @apply text-gray-800 font-semibold text-2xl my-4;
+}
+
+.markdown h3 {
+  @apply text-gray-800 font-semibold text-xl my-4;
+}
+
+.markdown h4 {
+  @apply text-gray-800 font-semibold text-lg my-4;
+}
+
+.markdown h5 {
+  @apply text-gray-800 font-semibold text-base my-4;
+}
+
+.markdown h6 {
+  @apply text-gray-800 font-semibold text-base my-4;
+}
+
+.markdown p {
+  @apply my-4;
+}
+
+.markdown ul {
+  @apply list-disc list-inside my-4;
+}
+
+.markdown ol {
+  @apply list-decimal list-inside my-4;
+}
+
+.markdown ul > li,
+.markdown ol > li {
+  @apply my-1;
+}
+
+.markdown ul > li ul,
+.markdown ol > li ol {
+  @apply ml-6;
+}
+
+.markdown blockquote {
+  @apply border-l-4 border-gray-200 pl-4 py-2 my-4 text-gray-500;
+}
+
+.markdown a {
+  @apply font-medium underline text-gray-900 hover:no-underline;
+}
+
+.markdown img {
+  @apply mx-auto my-4;
+}
+
+.markdown table {
+  @apply w-full my-4;
+}
+
+.markdown table thead tr {
+  @apply border-b border-gray-200;
+}
+
+.markdown table tbody tr:not(:last-child) {
+  @apply border-b border-gray-200;
+}
+
+.markdown table th {
+  @apply p-2 font-bold text-left;
+}
+
+.markdown table td {
+  @apply p-2 text-left;
+}
+
+.markdown table th[align="center"],
+.markdown table td[align="center"] {
+  @apply text-center;
+}
+
+.markdown table th[align="right"],
+.markdown table td[align="right"] {
+  @apply text-right;
+}
+
+.markdown table th:first-child,
+.markdown table td:first-child {
+  @apply pl-0;
+}
+
+.markdown table th:last-child,
+.markdown table td:last-child {
+  @apply pr-0;
+}
+
+.markdown code {
+  @apply py-[0.2rem] px-2 rounded-lg text-sm align-middle font-mono bg-gray-200;
+}
+
+.markdown pre > code {
+  @apply block p-4 rounded-lg text-sm align-middle font-mono;
+  /* Match the editor colors */
+  background-color: #282c34;
+  color: #abb2bf;
+}
+
+.markdown kbd {
+  @apply py-[0.2rem] px-2 rounded-lg text-xs align-middle font-mono border border-gray-300;
+  box-shadow: #cad5e0 0px -2px 0px 0px inset;
+}
+
+.markdown > :first-child {
+  @apply mt-0;
+}
+
+.markdown > :last-child {
+  @apply mb-0;
+}
+
+.markdown .katex-display {
+  @apply my-8;
+}
+
+/* Overrides for user-entered markdown */
+
+[data-element="cell"] .markdown h1,
+[data-element="cell"] .markdown h2 {
+  font-size: 0;
+}
+
+[data-element="cell"] .markdown h1:after,
+[data-element="cell"] .markdown h2:after {
+  @apply text-red-400 text-base font-medium;
+  content: "warning: heading levels 1 and 2 are reserved for notebook and section names, please use heading 3 and above.";
+}

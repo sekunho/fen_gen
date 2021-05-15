@@ -4,10 +4,11 @@ An attempt at multi-class neural network for generating FEN strings.
 
 ## Structure
 
-| Codebase         |        Description        |
-| :--------------- | :-----------------------: |
-| [waffle](waffle) | Model creation & training |
-| [pho](pho)       |        Web server         |
+| Codebase         |                 Description                  |
+| :--------------- | :------------------------------------------: |
+| [waffle](waffle) |          Model creation & training           |
+| [shoyu](shoyu)   | Generated model to be used by the web server |
+| [pho](pho)       |                  Web server                  |
 
 ## Credits
 

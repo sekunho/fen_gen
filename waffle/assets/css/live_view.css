@@ -1,0 +1,24 @@
+/* Hide Phoenix live reload frame */
+iframe[hidden] {
+  display: none;
+}
+
+/* LiveView specific classes */
+
+.phx-no-feedback.invalid-feedback,
+.phx-no-feedback .invalid-feedback {
+  display: none;
+}
+
+.phx-click-loading {
+  opacity: 0.5;
+  transition: opacity 1s ease-out;
+}
+
+.phx-disconnected {
+  cursor: wait;
+}
+
+.phx-disconnected * {
+  pointer-events: none;
+}
