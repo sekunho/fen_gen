@@ -1,14 +1,24 @@
 # FENGEN
 
-## Dataset
+## Introduction
 
-Before you begin, ensure that you've download the chess positions dataset from 
-[Kaggle](https://www.kaggle.com/koryakinp/chess-positions). Extract it to
-`waffle/notebook/dataset`.
+`fen_gen` generates a [FEN string](https://www.chess.com/terms/fen-chess) given an image of a chessboard.
+
+![](images/board.jpeg.jpeg)
+
+## Preparing the dataset
+
+I don't have a simple way of downloading this since Kaggle requires authentication to download any dataset. [Download here](https://www.kaggle.com/koryakinp/chess-positions). Extract it to the `waffle/notebook/dataset` directory. It should look something like this:
+
+```
+notebook
+├── dataset
+│   ├── test/ <- New
+│   └── train/ <- New
+└── fengen.livemd
+```
 
 ## Dependencies
-
-These are the dependencies needed for `fen_gen`'s model. `axon`
 
 ```elixir
 Mix.install([
@@ -17,3 +27,134 @@ Mix.install([
   {:nx, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "nx", override: true}
 ])
 ```
+
+## Preprocessing
+
+`fen_gen` uses a multi-class classification neural network to classify the piece on a board tile, if one exists. Since the tile positions itself is fixed throughout the dataset, there is no need to have the neural network classify it.
+
+### Downscaling
+
+The dataset has `80_000` training and `20_000` testing images. All of them are at 400x400 pixels. To speed up the time of training, then the images have to be downscaled to 200x200.
+
+### Dividing the tiles
+
+The chessboard is going to be divided into 64 tiles, 8 rows and columns. The images are uniformed throughout the dataset so there is no need for anything more complicated than this to derive the tile positions.
+
+```elixir
+defmodule Dataset do
+  @train_dir "../notebook/dataset/train"
+  @test_dir "../notebook/dataset/test"
+  @dirs [@train_dir, @test_dir]
+
+  @doc """
+  Preprocesses the data. It is assumed that you've set the datasets up 
+  in the `dataset` folder. `train` and `test` have to be present.
+
+  Options:
+   - `subset`: Takes a random subset from the dataset. 0 takes all.
+  """
+  def preprocess(dir, opts \\ []) when dir in @dirs do
+    source = IO.iodata_to_binary([dir, "/*.jpeg"])
+    dest = IO.iodata_to_binary([dir, "_modified"])
+
+    File.mkdir(dest)
+
+    source
+    |> Path.wildcard()
+    |> maybe_take_random_subset(opts)
+    |> Task.async_stream(&resize_and_split(&1, dest), timeout: :infinity)
+    |> Enum.to_list()
+  end
+
+  def train_dir, do: @train_dir
+  def test_dir, do: @test_dir
+
+  @img_res 200
+  defp resize_and_split(img_path, dest) when is_binary(img_path) and is_binary(dest) do
+    fen = Path.basename(img_path, ".jpeg")
+    img_folder = IO.iodata_to_binary([dest, "/", fen])
+
+    File.mkdir(img_folder)
+
+    """
+    convert '#{img_path}' \
+      -resize #{@img_res}#{@img_res} \
+      -crop 8x8@ +repage +adjoin \
+      -set filename:index "%[fx:t]" \
+      '#{img_folder}/tile-%[filename:index]' \
+    """
+    |> String.to_char_list()
+    |> :os.cmd()
+  end
+
+  defp maybe_take_random_subset(img_paths, opts) do
+    subset = Keyword.get(opts, :subset, 0)
+
+    if subset > 0 do
+      Enum.take_random(img_paths, subset)
+    else
+      img_paths
+    end
+  end
+end
+```
+
+If you wish to use only a subset of the images available:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Uses only 10 randomly selected images
+Dataset.preprocess(Dataset.train_dir(), subset: 10)
+```
+
+Evaluate the cell below if you want to preprocess the dataset.
+
+```elixir
+Dataset.preprocess(Dataset.train_dir())
+```
+
+Each direct subdirectory of `train_modified` contains 64 images - each image representing a tile. The subdirectory is named according to the FEN string the tiles represent.
+
+```
+train_modified
+├── r1BK3k-2N4p-8-6B1-1N6-3br1N1-7p-2q4n/
+├── r1K2N2-1r6-5k2-1r6-8-8-8-8/
+├── r1R5-5pR1-8-8-1R2p3-K6k-8-n7/
+├── r3k3-4PP2-R1B5-p1KB1p2-8-1P6-2R3p1-2r5/
+├── r3R3-1b5r-3Kp1Bk-8-5P2-1r5r-4p2b-1rb5/
+├── r4Nkr-1p6-8-b7-2K2b2-5p2-3R4-1n4n1/
+├── r7-1p2b3-1q1P4-3K4-p7-3Q2PP-r7-4r1Rk/
+├── r7-3P2b1-8-P2R2R1-1p6-8-p3K2k-B1R2n2/
+├── rN1N4-Q7-1n2b3-1b2N1r1-3n4-K1k3P1-2N5-B7/
+└── rn1r4-5K2-8-5k2-8-8-6N1-5q2/
+```
+
+## (WIP) Model
+
+```elixir
+# This is just a sample model just to test 
+# if the dependencies have been installed properly.
+# I'll be replacing this with something more
+# appropriate to the problem I'm trying to solve.
+Axon.input({nil, 1, 28, 28})
+|> Axon.flatten()
+|> Axon.dense(128, activation: :relu)
+|> Axon.dense(10, activation: :softmax)
+```
+
+## (WIP) Training
+
+## (WIP) Export
+
+At the time of writing, `axon`, or even `nx`, does not have the ability to export to the common model/training param format used by other tools. Instead, this will be only for `pho`'s direct consumption.
+
+## References
+
+* Practical Deep Learning for Coders [https://www.youtube.com/watch?v=V2h3IOBDvrA](https://www.youtube.com/watch?v=V2h3IOBDvrA)
+* A Comprehensive Guide to Convolutional Neural Networks [https://towardsdatascience.com/a-comprehensive-guide-to-convolutional-neural-networks-the-eli5-way-3bd2b1164a53](https://towardsdatascience.com/a-comprehensive-guide-to-convolutional-neural-networks-the-eli5-way-3bd2b1164a53)
+* Understanding Categorical Cross-Entropy Loss, Binary Cross-Entropy Loss, Softmax Loss, Logistic Loss, Focal Loss and all those confusing names [https://gombru.github.io/2018/05/23/cross_entropy_loss/](https://gombru.github.io/2018/05/23/cross_entropy_loss/)
+
+## Thank you
+
+Special thanks to the contributors behind [Elixir Nx](https://github.com/elixir-nx). Especially since I did not have to use Python. :)
