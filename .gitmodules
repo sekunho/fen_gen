@@ -1,3 +1,0 @@
-[submodule "waffle/livebook"]
-	path = waffle/livebook
-	url = https://github.com/elixir-nx/livebook.git

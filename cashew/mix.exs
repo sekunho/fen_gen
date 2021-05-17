@@ -5,7 +5,7 @@ defmodule Cashew.MixProject do
     [
       app: :cashew,
       version: "0.1.0",
-      elixir: "~> 1.12-rc",
+      elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -21,7 +21,10 @@ defmodule Cashew.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:pixels, "~> 0.1.0"}
+      {:pixels, "~> 0.1.0"},
+      {:axon, "~> 0.1.0-dev", github: "elixir-nx/axon", branch: "main"},
+      {:exla, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "exla", override: true},
+      {:nx, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "nx", override: true}
     ]
   end
 end

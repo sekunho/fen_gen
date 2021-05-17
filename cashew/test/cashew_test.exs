@@ -1,37 +1,31 @@
 defmodule CashewTest do
   use ExUnit.Case
-  doctest Cashew
+  # doctest Cashew
 
   @base_path "#{File.cwd!()}/test"
-  @data_path "#{@base_path}/data"
-  @bin_path_a "#{@base_path}/tiles_a.bin"
-  @bin_path_b "#{@base_path}/tiles_b.bin"
-  test "if lazy and eager yield the same bins" do
-    count = 64
+  @bin_dir "#{@base_path}/data"
+  @tiles_path "#{@bin_dir}/tiles.bin"
+  @labels_path "#{@bin_dir}/labels.bin"
+  @board_path "#{@base_path}/data/boards"
+  test "dump boards to bin" do
+    count = 2*64
     rows = 50
     cols = 50
+    labels = "nK*b*q*R*******k*****Pb*n**p***********r****B******q*****n***N**rrK**R********n********B******N******P************k******B***Qb*"
 
-    # Lazy version
-    @data_path
-    |> Cashew.stream_read_all()
-    |> Cashew.stream_dump_images(@bin_path_a, %{count: count, rows: rows, cols: cols})
+    File.rm_rf("#{@board_path}_tiles/")
 
-    bin_a = File.read!(@bin_path_a)
-    File.rm(@bin_path_a)
+    Cashew.stream_boards_to_bin(@board_path, @bin_dir, cleanup: false)
+    img_bin_result = File.read(@tiles_path)
+    label_bin_result = File.read(@labels_path)
 
-    assert <<^count::32, ^rows::32, ^cols::32, images_a::binary>> = bin_a
+    File.rm(@tiles_path)
+    File.rm(@labels_path)
 
-    # Eager
-    @data_path
-    |> Cashew.read_all()
-    |> Cashew.dump_images(@bin_path_b, %{count: count, rows: rows, cols: cols})
+    assert {:ok, img_bin} = img_bin_result
+    assert <<^count::32, ^rows::32, ^cols::32, _images::binary>> = img_bin
 
-    bin_b = File.read!(@bin_path_b)
-    File.rm(@bin_path_b)
-
-    assert <<^count::32, ^rows::32, ^cols::32, images_b::binary>> = bin_b
-
-    # Equality
-    assert images_a == images_b
+    assert {:ok, label_bin} = label_bin_result
+    assert <<^count::32, ^labels::binary>> = label_bin
   end
 end
