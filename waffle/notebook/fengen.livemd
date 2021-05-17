@@ -1,0 +1,228 @@
+# FENGEN
+
+## Introduction
+
+`fen_gen` generates a [FEN string](https://www.chess.com/terms/fen-chess) given an image of a chessboard.
+
+![](images/board.jpeg.jpeg)
+
+## Preparing the dataset
+
+I don't have a simple way of downloading this since Kaggle requires authentication to download any dataset. [Download here](https://www.kaggle.com/koryakinp/chess-positions). Extract it to the `waffle/notebook/dataset` directory. It should look something like this:
+
+```
+notebook
+├── dataset
+│   ├── test/ <- New
+│   └── train/ <- New
+└── fengen.livemd
+```
+
+## Dependencies
+
+```elixir
+Mix.install([
+  {:axon, "~> 0.1.0-dev", github: "elixir-nx/axon", branch: "main"},
+  {:exla, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "exla", override: true},
+  {:nx, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "nx", override: true},
+  {:pixels, "~> 0.1.0"}
+])
+```
+
+## Preprocessing
+
+```elixir
+flatten_channels = fn bin ->
+  bin
+  |> :binary.bin_to_list()
+  |> Enum.chunk_every(4)
+  |> Enum.map(fn
+    [0, 0, 0, 255] -> 0
+    [255, 255, 255, 255] -> 255
+  end)
+  |> :binary.list_to_bin()
+end
+```
+
+```elixir
+defmodule Dataset do
+  @doc """
+  Preprocesses the data. It is assumed that you've set the datasets up 
+  in the `dataset` folder. `train` and `test` have to be present.
+
+  Options:
+   - `subset`: Takes a random subset from the dataset. 0 takes all.
+  """
+  def preprocess(dir, opts \\ []) do
+    source = IO.iodata_to_binary([dir, "/*.jpeg"])
+    dest = IO.iodata_to_binary([dir, "_modified"])
+
+    File.mkdir(dest)
+
+    source
+    |> Path.wildcard()
+    |> maybe_take_random_subset(opts)
+    |> Task.async_stream(&resize_and_split(&1, dest), timeout: :infinity)
+    |> Enum.to_list()
+  end
+
+  defp resize_and_split(img_path, dest) when is_binary(img_path) and is_binary(dest) do
+    fen = Path.basename(img_path, ".jpeg")
+    img_folder = IO.iodata_to_binary([dest, "/", fen])
+
+    File.mkdir(img_folder)
+
+    """
+    convert '#{img_path}' \
+      -crop 8x8@ +repage +adjoin \
+      -monochrome \
+      -set filename:index "%[fx:t]" \
+      '#{img_folder}/tile-%[filename:index].png' \
+    """
+    |> String.to_char_list()
+    |> :os.cmd()
+
+    fen
+  end
+
+  defp maybe_take_random_subset(img_paths, opts) do
+    subset = Keyword.get(opts, :subset, 0)
+
+    if subset > 0 do
+      Enum.take_random(img_paths, subset)
+    else
+      img_paths
+    end
+  end
+end
+```
+
+`fen_gen` uses a multi-class classification neural network to classify the piece on a board tile, if one exists. Since the tile positions itself is fixed throughout the dataset, there is no need to have the neural network classify it.
+
+### Dividing the tiles
+
+The dataset has `80_000` training and `20_000` testing images. The chessboard is going to be divided into 64 tiles, 8 rows and columns. The images are uniformed throughout the dataset so there is no need for anything more complicated than this to derive the tile positions.
+
+```elixir
+source_dir = "../notebook/dataset/sample"
+target_dir = "../notebook/dataset/sample_modified"
+source_wildcard = IO.iodata_to_binary([source_dir, "/*.jpeg"])
+
+avail_fens =
+  source_dir
+  |> Dataset.preprocess(subset: 15)
+  |> Enum.map(&elem(&1, 1))
+```
+
+### Tile data
+
+```elixir
+import Pixels
+
+# Modifiable variables
+# batch_size = 5
+fens_length = length(avail_fens)
+dim_names = [:tiles, :channels, :tile_width, :tile_height]
+
+train_tensor =
+  for fen <- avail_fens do
+    IO.iodata_to_binary([target_dir, "/", fen, "/*.png"])
+    |> Path.wildcard()
+    |> Enum.map(fn path ->
+      path
+      |> read_file()
+      |> elem(1)
+      |> Map.fetch!(:data)
+      |> flatten_channels.()
+    end)
+  end
+  |> :binary.list_to_bin()
+  |> Nx.from_binary({:u, 8})
+  |> Nx.reshape({fens_length * 64, 1, 50, 50}, names: dim_names)
+  |> Nx.divide(255)
+  |> IO.inspect(label: "TENSOR")
+
+Nx.to_heatmap(train_tensor[[tiles: 0]])
+```
+
+### Label data
+
+The label data will be represented as a one-hot encoded vector with these positions `[rook, knight, bishop, king, queen, pawn, ROOK, KNIGHT, BISHOP, KING, QUEEN, PAWN]`.
+
+So if the piece is a `knight`, then the vector is going to be `[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]`.
+
+```elixir
+piece_to_vectors = %{
+  "r" => [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "n" => [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "b" => [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "k" => [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+  "q" => [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+  "p" => [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+  "R" => [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+  "N" => [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+  "B" => [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+  "K" => [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+  "Q" => [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+  "P" => [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+}
+
+Enum.map(avail_fens, fn fen ->
+  fen
+  |> IO.inspect(label: "FEN")
+  |> String.split("-")
+  |> Enum.reduce([], fn row, tile_vectors_a ->
+    vectors =
+      row
+      |> String.graphemes()
+      |> Enum.reduce([], fn tile, tile_vectors ->
+        case tile in ~w(1 2 3 4 5 6 7 8 9) do
+          true ->
+            blank_spaces = String.to_integer(tile)
+
+            vectors =
+              for _ <- 1..blank_spaces do
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+              end
+
+            tile_vectors ++ vectors
+
+          false ->
+            vector = piece_to_vectors[tile]
+            tile_vectors ++ [vector]
+        end
+      end)
+
+    tile_vectors_a ++ vectors
+  end)
+end)
+```
+
+## (WIP) Model
+
+```elixir
+# This is just a sample model just to test 
+# if the dependencies have been installed properly.
+# I'll be replacing this with something more
+# appropriate to the problem I'm trying to solve.
+Axon.input({nil, 1, 28, 28})
+|> Axon.flatten()
+|> Axon.dense(128, activation: :relu)
+|> Axon.dense(10, activation: :softmax)
+```
+
+## (WIP) Training
+
+## (WIP) Export
+
+At the time of writing, `axon`, or even `nx`, does not have the ability to export to the common model/training param format used by other tools. Instead, this will be only for `pho`'s direct consumption.
+
+## References
+
+* Practical Deep Learning for Coders [https://www.youtube.com/watch?v=V2h3IOBDvrA](https://www.youtube.com/watch?v=V2h3IOBDvrA)
+* A Comprehensive Guide to Convolutional Neural Networks [https://towardsdatascience.com/a-comprehensive-guide-to-convolutional-neural-networks-the-eli5-way-3bd2b1164a53](https://towardsdatascience.com/a-comprehensive-guide-to-convolutional-neural-networks-the-eli5-way-3bd2b1164a53)
+* Understanding Categorical Cross-Entropy Loss, Binary Cross-Entropy Loss, Softmax Loss, Logistic Loss, Focal Loss and all those confusing names [https://gombru.github.io/2018/05/23/cross_entropy_loss/](https://gombru.github.io/2018/05/23/cross_entropy_loss/)
+
+## Thank you
+
+Special thanks to the contributors behind [Elixir Nx](https://github.com/elixir-nx). Especially since I did not have to use Python. :)
