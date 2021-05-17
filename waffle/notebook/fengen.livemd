@@ -24,28 +24,28 @@ notebook
 Mix.install([
   {:axon, "~> 0.1.0-dev", github: "elixir-nx/axon", branch: "main"},
   {:exla, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "exla", override: true},
-  {:nx, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "nx", override: true}
+  {:nx, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "nx", override: true},
+  {:pixels, "~> 0.1.0"}
 ])
 ```
 
 ## Preprocessing
 
-`fen_gen` uses a multi-class classification neural network to classify the piece on a board tile, if one exists. Since the tile positions itself is fixed throughout the dataset, there is no need to have the neural network classify it.
-
-### Downscaling
-
-The dataset has `80_000` training and `20_000` testing images. All of them are at 400x400 pixels. To speed up the time of training, then the images have to be downscaled to 200x200.
-
-### Dividing the tiles
-
-The chessboard is going to be divided into 64 tiles, 8 rows and columns. The images are uniformed throughout the dataset so there is no need for anything more complicated than this to derive the tile positions.
+```elixir
+flatten_channels = fn bin ->
+  bin
+  |> :binary.bin_to_list()
+  |> Enum.chunk_every(4)
+  |> Enum.map(fn
+    [0, 0, 0, 255] -> 0
+    [255, 255, 255, 255] -> 255
+  end)
+  |> :binary.list_to_bin()
+end
+```
 
 ```elixir
 defmodule Dataset do
-  @train_dir "../notebook/dataset/train"
-  @test_dir "../notebook/dataset/test"
-  @dirs [@train_dir, @test_dir]
-
   @doc """
   Preprocesses the data. It is assumed that you've set the datasets up 
   in the `dataset` folder. `train` and `test` have to be present.
@@ -53,7 +53,7 @@ defmodule Dataset do
   Options:
    - `subset`: Takes a random subset from the dataset. 0 takes all.
   """
-  def preprocess(dir, opts \\ []) when dir in @dirs do
+  def preprocess(dir, opts \\ []) do
     source = IO.iodata_to_binary([dir, "/*.jpeg"])
     dest = IO.iodata_to_binary([dir, "_modified"])
 
@@ -66,10 +66,6 @@ defmodule Dataset do
     |> Enum.to_list()
   end
 
-  def train_dir, do: @train_dir
-  def test_dir, do: @test_dir
-
-  @img_res 200
   defp resize_and_split(img_path, dest) when is_binary(img_path) and is_binary(dest) do
     fen = Path.basename(img_path, ".jpeg")
     img_folder = IO.iodata_to_binary([dest, "/", fen])
@@ -78,13 +74,15 @@ defmodule Dataset do
 
     """
     convert '#{img_path}' \
-      -resize #{@img_res}#{@img_res} \
       -crop 8x8@ +repage +adjoin \
+      -monochrome \
       -set filename:index "%[fx:t]" \
-      '#{img_folder}/tile-%[filename:index]' \
+      '#{img_folder}/tile-%[filename:index].png' \
     """
     |> String.to_char_list()
     |> :os.cmd()
+
+    fen
   end
 
   defp maybe_take_random_subset(img_paths, opts) do
@@ -99,35 +97,105 @@ defmodule Dataset do
 end
 ```
 
-If you wish to use only a subset of the images available:
+`fen_gen` uses a multi-class classification neural network to classify the piece on a board tile, if one exists. Since the tile positions itself is fixed throughout the dataset, there is no need to have the neural network classify it.
 
-<!-- livebook:{"force_markdown":true} -->
+### Dividing the tiles
 
-```elixir
-# Uses only 10 randomly selected images
-Dataset.preprocess(Dataset.train_dir(), subset: 10)
-```
-
-Evaluate the cell below if you want to preprocess the dataset.
+The dataset has `80_000` training and `20_000` testing images. The chessboard is going to be divided into 64 tiles, 8 rows and columns. The images are uniformed throughout the dataset so there is no need for anything more complicated than this to derive the tile positions.
 
 ```elixir
-Dataset.preprocess(Dataset.train_dir())
+source_dir = "../notebook/dataset/sample"
+target_dir = "../notebook/dataset/sample_modified"
+source_wildcard = IO.iodata_to_binary([source_dir, "/*.jpeg"])
+
+avail_fens =
+  source_dir
+  |> Dataset.preprocess(subset: 15)
+  |> Enum.map(&elem(&1, 1))
 ```
 
-Each direct subdirectory of `train_modified` contains 64 images - each image representing a tile. The subdirectory is named according to the FEN string the tiles represent.
+### Tile data
 
+```elixir
+import Pixels
+
+# Modifiable variables
+# batch_size = 5
+fens_length = length(avail_fens)
+dim_names = [:tiles, :channels, :tile_width, :tile_height]
+
+train_tensor =
+  for fen <- avail_fens do
+    IO.iodata_to_binary([target_dir, "/", fen, "/*.png"])
+    |> Path.wildcard()
+    |> Enum.map(fn path ->
+      path
+      |> read_file()
+      |> elem(1)
+      |> Map.fetch!(:data)
+      |> flatten_channels.()
+    end)
+  end
+  |> :binary.list_to_bin()
+  |> Nx.from_binary({:u, 8})
+  |> Nx.reshape({fens_length * 64, 1, 50, 50}, names: dim_names)
+  |> Nx.divide(255)
+  |> IO.inspect(label: "TENSOR")
+
+Nx.to_heatmap(train_tensor[[tiles: 0]])
 ```
-train_modified
-├── r1BK3k-2N4p-8-6B1-1N6-3br1N1-7p-2q4n/
-├── r1K2N2-1r6-5k2-1r6-8-8-8-8/
-├── r1R5-5pR1-8-8-1R2p3-K6k-8-n7/
-├── r3k3-4PP2-R1B5-p1KB1p2-8-1P6-2R3p1-2r5/
-├── r3R3-1b5r-3Kp1Bk-8-5P2-1r5r-4p2b-1rb5/
-├── r4Nkr-1p6-8-b7-2K2b2-5p2-3R4-1n4n1/
-├── r7-1p2b3-1q1P4-3K4-p7-3Q2PP-r7-4r1Rk/
-├── r7-3P2b1-8-P2R2R1-1p6-8-p3K2k-B1R2n2/
-├── rN1N4-Q7-1n2b3-1b2N1r1-3n4-K1k3P1-2N5-B7/
-└── rn1r4-5K2-8-5k2-8-8-6N1-5q2/
+
+### Label data
+
+The label data will be represented as a one-hot encoded vector with these positions `[rook, knight, bishop, king, queen, pawn, ROOK, KNIGHT, BISHOP, KING, QUEEN, PAWN]`.
+
+So if the piece is a `knight`, then the vector is going to be `[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]`.
+
+```elixir
+piece_to_vectors = %{
+  "r" => [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "n" => [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "b" => [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "k" => [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+  "q" => [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+  "p" => [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+  "R" => [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+  "N" => [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+  "B" => [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+  "K" => [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+  "Q" => [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+  "P" => [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+}
+
+Enum.map(avail_fens, fn fen ->
+  fen
+  |> IO.inspect(label: "FEN")
+  |> String.split("-")
+  |> Enum.reduce([], fn row, tile_vectors_a ->
+    vectors =
+      row
+      |> String.graphemes()
+      |> Enum.reduce([], fn tile, tile_vectors ->
+        case tile in ~w(1 2 3 4 5 6 7 8 9) do
+          true ->
+            blank_spaces = String.to_integer(tile)
+
+            vectors =
+              for _ <- 1..blank_spaces do
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+              end
+
+            tile_vectors ++ vectors
+
+          false ->
+            vector = piece_to_vectors[tile]
+            tile_vectors ++ [vector]
+        end
+      end)
+
+    tile_vectors_a ++ vectors
+  end)
+end)
 ```
 
 ## (WIP) Model

@@ -16,14 +16,24 @@ If you need a guide in setting up each project, then check their READMEs.
 ## Dependencies
 
 You'll need to setup `asdf` and its plugins: `asdf-elixir`, `asdf-erlang`, and `asdf-bazel`.
+Although for `asdf-erlang`, you'll need to refer to [this](https://github.com/asdf-vm/asdf-erlang) to 
+make sure you have all of `erlang` dependencies first.
 
 ```bash
-# Activates a nix environment with some of the dependencies defined in `shell.nix`.
-nix-shell
+# In project root directory
 
-# Installs the remaining dependencies.
+asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git
+asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
+asdf plugin-add bazel https://github.com/rajatvig/asdf-bazel.git
+
+# Installs `elixir`, `erlang`, and `bazel`.
 asdf install
+
+# Activates a nix shell environment.
+nix-shell
 ```
+
+If you would like to use your own package manager(s), then feel free to take a peek at `.tool-versions`, and `shell.nix` to get the dependencies and their versions.
 
 ## TODO
 

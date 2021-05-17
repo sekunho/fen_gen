@@ -6,7 +6,6 @@ let
   inherit (lib) optional optionals;
 
   unstable = import (fetchTarball https://nixos.org/channels/nixos-unstable/nixexprs.tar.xz) { };
-
   nodejs = nodejs-14_x;
   imagemagick = unstable.imagemagick;
 in
