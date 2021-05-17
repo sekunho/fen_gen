@@ -8,6 +8,7 @@ An attempt at implementing a multi-class classification neural network for gener
 
 | Codebase         |                            Description                            |
 | :--------------- | :---------------------------------------------------------------: |
+| [cashew](cashew) |                 Helper functions for the dataset                  |
 | [waffle](waffle) | Contains the notebook, and livebook for model creation & training |
 | [pho](pho)       |                            Web server                             |
 
