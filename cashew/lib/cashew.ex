@@ -41,11 +41,8 @@ defmodule Cashew do
   Dump tile data into a bin file.
   """
   @spec dump_images([Pixels.t()], binary) :: :ok | {:error, atom}
-  def dump_images(images, name \\ "tiles.gz")
+  def dump_images(images, name \\ "tiles.gz", %{count: count, rows: rows, cols: cols})
       when is_list(images) and is_binary(name) do
-    [%{height: rows, width: cols} | _] = images
-    count = length(images)
-
     data =
       images
       |> Enum.map(fn img ->
@@ -55,25 +52,57 @@ defmodule Cashew do
 
     bin = <<count::32, rows::32, cols::32, data::binary>>
 
-    compress_and_write(bin, name)
+    File.write(name, bin)
   end
 
   @doc """
   Dump labels into a bin file.
   """
   @spec dump_tile_labels([binary], binary) :: :ok | {:error, atom}
-  def dump_tile_labels(labels, name \\ "labels.gz") do
+  def dump_tile_labels(labels, name \\ "labels.bin") do
     count = length(labels)
     data = :binary.list_to_bin(labels)
     bin = <<count::32, data::binary>>
 
-    compress_and_write(bin, name)
+    File.write(name, bin)
   end
 
-  defp compress_and_write(data, name) do
-    bin = :zlib.gzip(data)
+  ### LAZY VERSIONS
 
-    File.write(name, bin)
+  @doc """
+  Lazy version of `read_all/1`.
+  """
+  def stream_read_all(path) do
+    [path, "/*.png"]
+    |> IO.iodata_to_binary()
+    |> Path.wildcard()
+    |> Stream.map(fn path ->
+      {:ok, image} = Pixels.read_file(path)
+
+      image
+    end)
+  end
+
+  @doc """
+  Lazily dumps tile data into a bin file.
+
+  Note: This will overwrite any existing bin of the same name.
+  """
+  def stream_dump_images(lazy_enum, name \\ "tiles.bin", %{count: count, rows: rows, cols: cols})
+      when is_struct(lazy_enum) and is_binary(name) do
+    lazy_bin_list = Stream.map(lazy_enum, &Map.fetch!(&1, :data))
+    bin_metadata = <<count::32, rows::32, cols::32>>
+
+    File.rm(name)
+    File.write!(name, bin_metadata)
+
+    file = File.open!(name, [:append, :binary])
+
+    lazy_bin_list
+    |> Stream.map(&IO.binwrite(file, &1))
+    |> Stream.run()
+
+    File.close(file)
   end
 
   defp resize_and_split(img_path, dest) when is_binary(img_path) and is_binary(dest) do

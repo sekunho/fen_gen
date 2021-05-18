@@ -26,3 +26,5 @@ cashew-*.tar
 /tmp/
 
 /**/*.gz
+
+.elixir_ls/
