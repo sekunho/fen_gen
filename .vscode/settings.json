@@ -1,4 +1,4 @@
 {
-  "python.pythonPath": "/bin/python3",
+  "python.pythonPath": "/nix/store/66fbv9mmx1j4hrn9y06kcp73c3yb196r-python3-3.8.9/bin/python",
   "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix"
 }

@@ -6,7 +6,7 @@ defmodule FenGenWeb.PageLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, allow_upload(socket, :board, accept: ~w(.jpg .jpeg), max_entries: 4)}
+    {:ok, allow_upload(socket, :board, accept: ~w(.jpeg), max_entries: 4)}
   end
 
   @impl true
@@ -18,10 +18,11 @@ defmodule FenGenWeb.PageLive do
   def handle_event("save", _params, socket) do
     uploaded_files =
       consume_uploaded_entries(socket, :board, fn %{path: path}, _entry ->
-        dest = Path.join([:code.priv_dir(:fen_gen), "static", "uploads", Path.basename(path)])
-        IO.inspect(dest)
-        File.mkdir(dest) |> IO.inspect()
-        File.cp!(path, dest)
+        file_name = Path.basename(path)
+        dest = Application.fetch_env!(:fen_gen, :upload_path)
+
+        File.mkdir_p(dest)
+        File.cp!(path, "#{dest}/#{file_name}.jpeg")
         Routes.static_path(socket, "/uploads/#{Path.basename(dest)}")
       end)
 
