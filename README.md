@@ -1,17 +1,13 @@
-# ♟️ FENGEN
+# FENGEN
 
-An attempt at implementing a multi-class classification neural network for generating FEN strings.
+## Setup
 
-![board](board.jpeg)
+1. Ensure you have `nix` installed.
+2. In the project root directory: `nix-shell`
+3. Install dependencies with `mix deps.get`
+4. Install Node.js dependencies with `npm install` inside the `assets` directory
+5. Start Phoenix endpoint with `mix phx.server`
 
-## Structure
-
-| Codebase         |      Description       |
-| :--------------- | :--------------------: |
-| [shrimp](shrimp) | Train and export model |
-| [pho](pho)       |       Web server       |
-
-
-## Credits
-
-- Pavel Koryakin for the dataset https://www.kaggle.com/koryakinp/chess-positions
+Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+  
+Then, you can use a live server to hot reload changes.
