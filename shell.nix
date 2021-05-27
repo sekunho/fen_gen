@@ -18,7 +18,6 @@ mkShell {
     erlang
     tensorflow
     scikitimage
-    python38
     inotify-tools
   ];
 
