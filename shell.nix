@@ -5,8 +5,8 @@ with pkgs;
 let
   inherit (lib) optional optionals;
   nodejs = nodejs-14_x;
-  erlang = beam.interpreters.erlangR23;
-  elixir = beam.packages.erlangR23.elixir;
+  erlang = beam.interpreters.erlangR24;
+  elixir = beam.packages.erlangR24.elixir_1_12;
   mach-nix = import (builtins.fetchGit {
     url = "https://github.com/DavHau/mach-nix/";
     ref = "refs/tags/3.3.0";
