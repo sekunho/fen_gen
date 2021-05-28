@@ -8,21 +8,21 @@
   grid-template-columns: repeat(8, 12.5%);
 
   :nth-child(even) {
-    :nth-child(even) {
+    div:nth-child(even) {
       @apply bg-gray-100;
     }
 
-    :nth-child(odd) {
+    div:nth-child(odd) {
       @apply bg-gray-500;
     }
   }
 
   :nth-child(odd) {
-    :nth-child(odd) {
+    div:nth-child(odd) {
       @apply bg-gray-100;
     }
 
-    :nth-child(even) {
+    div:nth-child(even) {
       @apply bg-gray-500;
     }
   }

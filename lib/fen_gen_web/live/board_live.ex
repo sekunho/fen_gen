@@ -58,7 +58,7 @@ defmodule FenGenWeb.BoardLive do
   end
 
   defp get_tile_state(board_state, row, col) do
-    index = row + col
+    index = (row * 8) + col
 
     Enum.at(board_state, index)
   end

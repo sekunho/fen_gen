@@ -14,9 +14,10 @@
     <div class="xl:grid xl:grid-cols-4-1">
       <div class="mx-auto space-y-8">
         <div id="board">
-          <div :for={{ row <- 0..7 }} id="row-{{ row }}">
+          <div :for={{ col <- 0..7 }} id="col-{{ col }}">
             <Tile 
-              :for={{ col <- 0..7 }} 
+              :for={{ row <- 0..7 }}
+              id="row-{{ row }}"
               current_state={{ get_tile_state(@board_state, row, col) }} />
           </div>
         </div>

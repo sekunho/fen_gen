@@ -11,3 +11,8 @@
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
   
 Then, you can use a live server to hot reload changes.
+
+## Credits
+
+- Pavel Koryakin for the dataset https://www.kaggle.com/koryakinp/chess-positions
+- Colin M.L. Burnett for the chess set assets. (LICENSED UNDER GPLv2+)
