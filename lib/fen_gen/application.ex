@@ -5,6 +5,15 @@ defmodule FenGen.Application do
 
   use Application
 
+  defp poolboy_config do
+    [
+      name: {:local, :worker},
+      worker_module: FenGen.Worker,
+      size: 2,
+      max_overflow: 2
+    ]
+  end
+
   def start(_type, _args) do
     children = [
       # Start the Telemetry supervisor
@@ -13,7 +22,7 @@ defmodule FenGen.Application do
       {Phoenix.PubSub, name: FenGen.PubSub},
       # Start the Endpoint (http/https)
       FenGenWeb.Endpoint,
-      FenGen.Worker
+      :poolboy.child_spec(:worker, poolboy_config())
       # Start a worker by calling: FenGen.Worker.start_link(arg)
       # {FenGen.Worker, arg}
     ]

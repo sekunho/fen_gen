@@ -67,8 +67,6 @@ config :phoenix, :stacktrace_depth, 20
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
 
-config :fen_gen, upload_path: "priv/uploads"
-
-config :fen_gen, FenGen.Worker,
-  python: "python",
-  predict_script: "scripts/predict.py"
+config :fen_gen,
+  upload_path: "priv/uploads",
+  scripts_path: "priv/scripts"
