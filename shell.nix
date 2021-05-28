@@ -7,6 +7,21 @@ let
   nodejs = nodejs-14_x;
   erlang = beam.interpreters.erlangR23;
   elixir = beam.packages.erlangR23.elixir;
+  mach-nix = import (builtins.fetchGit {
+    url = "https://github.com/DavHau/mach-nix/";
+    ref = "refs/tags/3.3.0";
+  }) {
+    python = "python38";
+  };
+
+  tensorflow = mach-nix.mkPython {
+    requirements = ''
+      tensorflow==2.5.0
+      scikit-image
+      numpy
+    '';
+  };
+
 in
 mkShell {
   LOCALE_ARCHIVE_2_27 = "${glibcLocales}/lib/locale/locale-archive";
@@ -16,8 +31,8 @@ mkShell {
     nodejs
     elixir
     erlang
+    python38
     tensorflow
-    scikitimage
     inotify-tools
   ];
 

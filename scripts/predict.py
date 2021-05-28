@@ -7,6 +7,7 @@ from skimage import io, transform
 from tensorflow import keras
 
 MODEL_PATH = os.path.abspath("./scripts/model.h5")
+PIECES = "*rnbqkpRNBQKP"
 
 def process_board(board_path):
     # Dimensions of each tile
@@ -31,6 +32,11 @@ def prep_board(img_path):
 
   return np.array(xs)
 
+def get_piece(x):
+  x_max = np.argmax(x)
+
+  return PIECES[x_max]
+
 model = keras.models.load_model(MODEL_PATH)
 
 for line in sys.stdin:
@@ -38,14 +44,10 @@ for line in sys.stdin:
 
     if line == "": break
 
-    model.predict()
-    
-    # # strings to ints, and sum
-    # values = line.split(",")
-    # nums = map(int, values)
-    # result = sum(nums)
+    x_predict = prep_board(line)
+    predictions = model.predict(x_predict)
+    pieces_predict = list(map(get_piece, predictions))
+    prediction = "".join(pieces_predict)
 
-    # send the result via stdout
-    # sys.stdout.write(str(result) + "\n")
-    sys.stdout.write(line)
+    sys.stdout.write(prediction + "\n")
     sys.stdout.flush()

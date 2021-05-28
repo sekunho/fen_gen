@@ -12,7 +12,8 @@ defmodule FenGen.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: FenGen.PubSub},
       # Start the Endpoint (http/https)
-      FenGenWeb.Endpoint
+      FenGenWeb.Endpoint,
+      FenGen.Worker
       # Start a worker by calling: FenGen.Worker.start_link(arg)
       # {FenGen.Worker, arg}
     ]
