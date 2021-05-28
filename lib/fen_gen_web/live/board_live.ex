@@ -1,8 +1,12 @@
 defmodule FenGenWeb.BoardLive do
   use Surface.LiveView
   alias FenGen.FEN
+  alias FenGenWeb.Components.Tile
+
+  @default_board Stream.repeatedly(fn -> "*" end) |> Enum.take(64)
 
   data fen, :string, default: ""
+  data board_state, :map, default: @default_board
 
   @impl true
   def mount(_params, _session, socket) do
@@ -46,9 +50,16 @@ defmodule FenGenWeb.BoardLive do
 
   @impl true
   def handle_info({:data, img_path, prediction}, socket) do
+    board_state = String.graphemes(prediction)
     fen = FEN.parse_prediction(prediction)
     File.rm(img_path)
 
-    {:noreply, assign(socket, fen: fen)}
+    {:noreply, assign(socket, fen: fen, board_state: board_state)}
+  end
+
+  defp get_tile_state(board_state, row, col) do
+    index = (row * 8) + col
+
+    Enum.at(board_state, index)
   end
 end

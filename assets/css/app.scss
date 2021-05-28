@@ -3,6 +3,31 @@
 @tailwind components;
 @tailwind utilities;
 
+#board {
+  @apply grid shadow-md;
+  grid-template-columns: repeat(8, 12.5%);
+
+  :nth-child(even) {
+    div:nth-child(even) {
+      @apply bg-gray-100;
+    }
+
+    div:nth-child(odd) {
+      @apply bg-gray-500;
+    }
+  }
+
+  :nth-child(odd) {
+    div:nth-child(odd) {
+      @apply bg-gray-100;
+    }
+
+    div:nth-child(even) {
+      @apply bg-gray-500;
+    }
+  }
+}
+
 /* LiveView specific classes for your customizations */
 .phx-no-feedback.invalid-feedback,
 .phx-no-feedback .invalid-feedback {
