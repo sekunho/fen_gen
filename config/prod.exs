@@ -11,7 +11,9 @@ use Mix.Config
 # before starting your production server.
 config :fen_gen, FenGenWeb.Endpoint,
   url: [host: "example.com", port: 80],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  cache_static_manifest: "priv/static/cache_manifest.json",
+
+config :fen_gen, upload_path: "/var/www/labs/priv/static/uploads"
 
 # Do not print debug messages in production
 config :logger, level: :info
