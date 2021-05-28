@@ -47,13 +47,14 @@ defmodule FenGenWeb.PageLive do
 
   @impl true
   def handle_info({_port, {:data, prediction}}, socket) do
+    IO.inspect(prediction)
     fen =
       prediction
       |> String.trim()
       |> String.graphemes()
       |> Enum.chunk_every(8)
       |> Enum.map(fn chunks ->
-        fen =
+        {fen, prev_blanks} =
           Enum.reduce(chunks, {"", 0}, fn char, {fen, prev_blanks} ->
             cond do
               char == "*" ->
@@ -66,7 +67,13 @@ defmodule FenGenWeb.PageLive do
                 {IO.iodata_to_binary([fen, char]), 0}
             end
           end)
-          |> elem(0)
+
+          fen =
+            if prev_blanks > 0 do
+              IO.iodata_to_binary([fen, Integer.to_string(prev_blanks)])
+            else
+              fen
+            end
 
           IO.iodata_to_binary([fen, "\\"])
       end)
