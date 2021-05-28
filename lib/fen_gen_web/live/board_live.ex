@@ -1,6 +1,7 @@
 defmodule FenGenWeb.BoardLive do
   use Surface.LiveView
   alias FenGen.FEN
+  alias FenGenWeb.Components.Tile
 
   data fen, :string, default: ""
 

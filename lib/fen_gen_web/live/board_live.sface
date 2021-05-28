@@ -10,16 +10,27 @@
       <a class="text-indigo-600" target="_blank" href="https://www.kaggle.com/koryakinp/chess-positions">Kaggle</a>
     </p>
   </div>
-  <div class="flex flex-col items-center mx-auto mt-6 md:mt-12 w-full md:w-1/2 space-y-6 md:px-12">
-    <div id="image" class="flex flex-col rounded-lg shadow-lg h-96 w-full bg-white">
-      
-    </div>
-    <form id="upload-form" phx-submit="save" phx-change="validate">
-      {{ live_file_input @uploads.board }}
-      <button type="submit">Upload</button>
-    </form>
-    <div class="whitespace-nowrap w-full bg-gray-700 rounded-lg h-12 shadow-md text-gray-50 text-lg flex items-center px-4 overflow-x-auto overflow-y-hidden">
-      {{ @fen }}
+  <div class="flex flex-col items-center mx-auto mt-6 md:mt-12 w-full space-y-6 md:px-12">
+    <div class="xl:grid xl:grid-cols-4-1">
+      <div class="mx-auto space-y-8">
+        <div id="board">
+          <div :for={{ row_num <- 1..8 }} id="row-{{ row_num }}">
+            <Tile :for={{ _ <- 1..8 }}/>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="font-medium text-gray-800 text-md">FEN</span>
+          <div class="whitespace-nowrap w-full bg-gray-700 rounded-lg h-10 shadow-md text-gray-50 text-lg flex items-center px-4 overflow-x-auto overflow-y-hidden">
+            {{ @fen }}
+          </div>
+        </div>
+      </div>
+      <div>
+        <form id="upload-form" phx-submit="save" phx-change="validate">
+          {{ live_file_input @uploads.board }}
+          <button type="submit">Upload</button>
+        </form>
+      </div>
     </div>
   </div>
 </div>

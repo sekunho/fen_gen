@@ -27,7 +27,7 @@ defmodule FenGen.FEN do
           fen
         end
 
-      IO.iodata_to_binary([fen, "\\"])
+      IO.iodata_to_binary([fen, "/"])
     end)
     |> IO.iodata_to_binary()
   end

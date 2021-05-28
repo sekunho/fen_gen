@@ -11,7 +11,16 @@ module.exports = {
     extend: {
       fontFamily: theme => ({
         sans: ['Inter', 'sans-serif']
-      })
+      }),
+      height: {
+        '1/8': '12.5%',
+      },
+      width: {
+        '1/8': '12.5%',
+      },
+      gridTemplateColumns: {
+        '4-1': '75% 25%'
+      }
     },
   },
   variants: {
