@@ -35,3 +35,4 @@ npm-debug.log
 /priv/uploads/
 
 .elixir_ls/
+.vscode/
