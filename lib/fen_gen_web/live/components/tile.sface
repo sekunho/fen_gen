@@ -2,7 +2,7 @@
   title={{ @current_state }}
   class="h-11 w-11 sm:h-16 sm:w-16 md:h-20 md:w-20 flex items-center justify-center">
   <img 
-    class="bg-transparent"
+    class="bg-transparent h-full w-full"
     :if={{ @current_state != "*" }}
     src="{{ Routes.static_path(@socket, "/images/cburnett/#{@current_state}.svg") }}" 
     alt={{ @current_state }} />
