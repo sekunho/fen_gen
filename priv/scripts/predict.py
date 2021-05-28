@@ -6,7 +6,7 @@ from skimage.util.shape import view_as_blocks
 from skimage import io, transform
 from tensorflow import keras
 
-MODEL_PATH = os.path.abspath("./scripts/model.h5")
+MODEL_PATH = os.path.abspath("./priv/scripts/model.h5")
 PIECES = "*rnbqkpRNBQKP"
 
 def process_board(board_path):
@@ -49,5 +49,5 @@ for line in sys.stdin:
     pieces_predict = list(map(get_piece, predictions))
     prediction = "".join(pieces_predict)
 
-    sys.stdout.write(prediction + "\n")
+    sys.stdout.write(line + "," + prediction + "\n")
     sys.stdout.flush()

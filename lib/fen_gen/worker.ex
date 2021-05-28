@@ -3,9 +3,11 @@ defmodule FenGen.Worker do
 
   @impl true
   def init(:ok) do
+    scripts_path = Application.fetch_env!(:fen_gen, :scripts_path)
+
     port =
       Port.open(
-        {:spawn, "python scripts/predict.py"},
+        {:spawn, "python #{scripts_path}/predict.py"},
         [:binary]
       )
 
@@ -14,7 +16,7 @@ defmodule FenGen.Worker do
 
   @impl true
   def handle_call({:predict, pid, img_path}, _from, state) do
-    Port.command(state.port, img_path)
+    Port.command(state.port, [img_path, "\n"])
     state = put_in(state, [:requests, img_path], pid)
 
     {:reply, img_path, state}
@@ -22,8 +24,9 @@ defmodule FenGen.Worker do
 
   @impl true
   def handle_info({_port, {:data, data}}, state) do
-    # {from_pid, worker} = pop_in(worker, [:requests, image_id])
-    IO.inspect(data)
+    [img_path, prediction] = String.split(data, ",")
+    {from_pid, state} = pop_in(state, [:requests, img_path])
+    send(from_pid, {:data, img_path, prediction})
 
     {:noreply, state}
   end
