@@ -7,18 +7,18 @@ ENV LANG=C.UTF-8
 
 ## Cache nix derivations
 
-COPY nix nix
+COPY nix nix/
 RUN apk --no-cache --update add git && \
     nix-shell nix/packages.nix --run exit
 
 ## Build mix release
 
-COPY assets assets
-COPY mix.* .
-COPY lib lib
-COPY priv priv
-COPY default.nix .
-COPY config config
+COPY assets assets/
+COPY mix.* ./
+COPY lib lib/
+COPY priv priv/
+COPY default.nix ./
+COPY config config/
 
 RUN nix-build default.nix && \
     mkdir /tmp/nix-store-closure
@@ -36,7 +36,7 @@ EXPOSE 8080
 ENV LANG=C.UTF-8
 WORKDIR /opt/app
 
-COPY --from=builder /tmp/nix-store-closure /nix/store
-COPY --from=builder /opt/app/result /opt/app
+COPY --from=builder /tmp/nix-store-closure /nix/store/
+COPY --from=builder /opt/app/result /opt/app/
 
 CMD ["prod/rel/fen_gen/bin/fen_gen", "start"]
