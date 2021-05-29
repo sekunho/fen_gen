@@ -1,4 +1,6 @@
-name: CI
+name: Test
+
+# Should change this to use nix probably.
 
 on:
   push:
@@ -6,7 +8,6 @@ on:
 
   pull_request:
     branches: [ main ]
-
 
 jobs:
   test:
