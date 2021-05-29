@@ -6,6 +6,15 @@ on:
 
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - '.github/workflows/ci.yml'
+      - 'LICENSE'
+      - 'test/**/*'
+      - '.gitignore'
+      - 'board.jpeg'
+      - 'shell.nix'
+      - 'README.md'
+      - '.do/**'
 
 jobs:
   push:

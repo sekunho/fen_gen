@@ -13,10 +13,11 @@ spec:
     - key: SECRET_KEY_BASE
       scope: RUN_AND_BUILD_TIME
       value: EV[1:UYcoAcLUwCjOfO29AnfLIbtKB1OxoO/T:wCCTZ07LBVea/791IA68D4TSMq3qSkuenm5RHsxOwOh7GgmoGyrzQU+Cwprwl+JnrJ1RopQykEM8UZG4cFBhNOR/8w6X+wSgOSHf/7Qas5Y=]
-    github:
-      branch: 24-deploy
-      deploy_on_push: true
-      repo: imsekun/fen_gen
+    image:
+      registry: imsekun
+      registry_type: DOCKER_HUB
+      repository: fengen
+      tag: 0.1.0
     http_port: 8080
     instance_count: 1
     instance_size_slug: professional-xs
