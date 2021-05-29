@@ -16,7 +16,7 @@ jobs:
       run: docker login --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}
 
     - name: Build image
-      run: docker build -t boreddevco/imsekun/fengen:0.1.0 .
+      run: docker build -t imsekun/fengen:0.1.0 .
 
     - name: Publish image
-      run: docker push boreddevco/imsekun/fengen:0.1.0
+      run: docker push imsekun/fengen:0.1.0
