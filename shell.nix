@@ -7,6 +7,8 @@ let
   nodejs = nodejs-14_x;
   erlang = beam.interpreters.erlangR24;
   elixir = beam.packages.erlangR24.elixir_1_12;
+  podman = pkgs.podman;
+
   mach-nix = import (builtins.fetchGit {
     url = "https://github.com/DavHau/mach-nix/";
     ref = "refs/tags/3.3.0";
@@ -18,10 +20,9 @@ let
     requirements = ''
       tensorflow==2.5.0
       scikit-image
-      numpy
+      numpy==1.19.2
     '';
   };
-
 in
 mkShell {
   LOCALE_ARCHIVE_2_27 = "${glibcLocales}/lib/locale/locale-archive";

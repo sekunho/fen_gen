@@ -1,0 +1,23 @@
+name: Test
+
+# Should change this to use nix probably.
+
+on:
+  push:
+    branches: [ main ]
+
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - uses: actions/setup-elixir@v1
+          with:
+            otp-version: '23.3.1'
+            elixir-version: '1.11.4'
+            experimental-otp: true
+        - run: mix deps.get
+        - run: mix test

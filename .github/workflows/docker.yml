@@ -1,0 +1,28 @@
+name: Push Docker image
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '.github/workflows/ci.yml'
+      - 'LICENSE'
+      - 'test/**/*'
+      - '.gitignore'
+      - 'board.jpeg'
+      - 'shell.nix'
+      - 'README.md'
+      - '.do/**'
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Login Docker
+      run: docker login --username '${{ secrets.USERNAME }}' --password '${{ secrets.PASSWORD }}'
+
+    - name: Build image
+      run: docker build -t hsekun/fengen:0.1.0 .
+
+    - name: Publish image
+      run: docker push hsekun/fengen:0.1.0

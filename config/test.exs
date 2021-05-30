@@ -8,3 +8,7 @@ config :fen_gen, FenGenWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+config :fen_gen,
+  upload_path: "priv/uploads",
+  scripts_path: "priv/scripts"
