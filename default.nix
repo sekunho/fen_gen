@@ -2,6 +2,8 @@
 
 with pkgs;
 
+# TODO: This could definitely be improved. Especially with the inheriting of `pkgs`.
+
 stdenv.mkDerivation {
   pname = "fengen";
   version = "0.1.0";
@@ -9,6 +11,7 @@ stdenv.mkDerivation {
   src = ./.;
 
   buildInputs = [ (import ./nix/packages.nix { inherit pkgs; }) ];
+  # propagatedBuildInputs = [ (import ./nix/runtime.nix { inherit pkgs; }) ];
   
   # Need `export HOME$(mktemp -d)` because otherwise
   # there will be a permission issue, and hex won't
@@ -18,7 +21,7 @@ stdenv.mkDerivation {
 
   buildPhase = ''
     export HOME=$(mktemp -d)
-    export MIX_ENV=prod    
+    export MIX_ENV=prod
 
     mix do local.hex --force, local.rebar --force
     mix do deps.get, deps.compile
@@ -30,9 +33,6 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
-    echo "=========> DIR OF INSTALL PHASE"
-    ls -la
-
     cp -R _build $out
     cp -R priv $out
     cp -R config $out

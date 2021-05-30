@@ -8,29 +8,15 @@ let
   nodejs = nodejs-14_x;
   erlang = beam.interpreters.erlangR24;
   elixir = beam.packages.erlangR24.elixir_1_12;
-
-  mach-nix = import (builtins.fetchGit {
-    url = "https://github.com/DavHau/mach-nix/";
-    ref = "refs/tags/3.3.0";
-  }) {
-    python = "python38";
-  };
-
-  tensorflow = mach-nix.mkPython {
-    requirements = ''
-      tensorflow==2.5.0
-      scikit-image
-      numpy==1.19.2
-    '';
-  };
 in
 buildEnv {
-  name = "fengen-packages";
-  paths = [
+  name = "packages";
+
+  paths = with python38Packages; [
     elixir
     erlang
     nodejs
-    # python38
-    # tensorflow
+    python38
+    pip
   ];
 }

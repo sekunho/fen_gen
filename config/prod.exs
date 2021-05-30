@@ -13,7 +13,7 @@ base_path = "/opt/app"
 
 config :fen_gen,
   upload_path: "#{base_path}/priv/static/uploads",
-  scripts_path: "#{base_path}/priv/static/scripts"
+  scripts_path: "#{base_path}/priv/scripts"
 
 # Do not print debug messages in production
 config :logger, level: :info
