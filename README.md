@@ -16,7 +16,7 @@ The `predict.py` script is ran by a GenServer worker/process, which is "replicat
 
 ## Deploy to DO
 
-[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/imsekun/fen_gen/tree/main)
+[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/hsekun/fen_gen/tree/main)
 
 ## Dev Setup
 
@@ -56,7 +56,7 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 ## License
 
-[FENGEN](https://github.com/imsekun/fen_gen)'s code is licensed under [MIT](LICENSE).
+[FENGEN](https://github.com/hsekun/fen_gen)'s code is licensed under [MIT](LICENSE).
 
 ## Credits
 

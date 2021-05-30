@@ -4,8 +4,8 @@
       ♟️ FENGEN
     </h2>
     <p class="mt-3 mx-auto text-base md:text-lg text-gray-500 sm:mt-4">
-      Made by <a class="text-indigo-600" target="_blank" href="https://www.github.com/imsekun">Sek Un</a> 
-      • <a class="text-indigo-600" target="_blank" href="https://www.github.com/imsekun/fengen">Source code</a>
+      Made by <a class="text-indigo-600" target="_blank" href="https://www.github.com/hsekun">Sek Un</a> 
+      • <a class="text-indigo-600" target="_blank" href="https://www.github.com/hsekun/fengen">Source code</a>
       • Dataset from Pavel Koryakin @
       <a class="text-indigo-600" target="_blank" href="https://www.kaggle.com/koryakinp/chess-positions">Kaggle</a>
     </p>
@@ -17,7 +17,6 @@
           <div :for={{ col <- 0..7 }} id="col-{{ col }}">
             <Tile 
               :for={{ row <- 0..7 }}
-              id="row-{{ row }}"
               current_state={{ get_tile_state(@board_state, row, col) }} />
           </div>
         </div>

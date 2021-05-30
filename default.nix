@@ -6,7 +6,7 @@ with pkgs;
 
 stdenv.mkDerivation {
   pname = "fengen";
-  version = "0.1.0";
+  version = "0.1.1";
 
   src = ./.;
 

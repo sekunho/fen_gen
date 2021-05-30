@@ -17,7 +17,7 @@ spec:
       registry: hsekun
       registry_type: DOCKER_HUB
       repository: fengen
-      tag: 0.1.0
+      tag: 0.1.1
     http_port: 8080
     instance_count: 1
     instance_size_slug: professional-xs
