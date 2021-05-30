@@ -22,7 +22,10 @@ jobs:
       run: docker login --username '${{ secrets.USERNAME }}' --password '${{ secrets.PASSWORD }}'
 
     - name: Build image
-      run: docker build -t hsekun/fengen:0.1.1 .
+      run: docker build -t hsekun/fengen:0.1.1 -t hsekun/fengen:latest .
 
     - name: Publish image
       run: docker push hsekun/fengen:0.1.1
+
+    - name: Publish image as latest
+      run: docker push hsekun/fengen:latest
