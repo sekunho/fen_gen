@@ -18,6 +18,10 @@ The `predict.py` script is ran by a GenServer worker/process, which is "replicat
 
 [![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/hsekun/fen_gen/tree/main&refcode=c9e27546f1e9)
 
+## Prod Setup
+
+Container image is used to deploy to DO. Dependencies are handled by `nix`. There are better ways to shrink the image size (`erlang` & `tensorflow` are rather large), but this will have to do for now.
+
 ## Dev Setup
 
 Ensure you have the `nix` package manager. If you're using NixOS then you can skip this.
@@ -26,10 +30,14 @@ Ensure you have the `nix` package manager. If you're using NixOS then you can sk
 curl -L https://nixos.org/nix/install | sh
 ```
 
-Activate the nix environment to fetch necessary dependencies. This also automatically pulls a Postgres 13 image.
+Activate the nix environment to fetch necessary dependencies.
 
 ```bash
+# If you don't need the libraries/packages from the external environment
 nix-shell --pure
+
+# Otherwise
+nix-shell
 ```
 
 If you want to open your IDE/text editor within the environment, you can do so within it.
