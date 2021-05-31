@@ -16,7 +16,7 @@ The `predict.py` script is ran by a GenServer worker/process, which is "replicat
 
 ## Deploy to DO
 
-[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/hsekun/fen_gen/tree/main)
+[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/hsekun/fen_gen/tree/main&refcode=c9e27546f1e9)
 
 ## Dev Setup
 
