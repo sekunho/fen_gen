@@ -4,8 +4,8 @@
       ♟️ FENGEN
     </h2>
     <p class="mt-3 mx-auto text-base md:text-lg text-gray-500 sm:mt-4">
-      Made by <a class="text-indigo-600" target="_blank" href="https://www.github.com/hsekun">Sek Un</a> 
-      • <a class="text-indigo-600" target="_blank" href="https://www.github.com/hsekun/fen_gen">Source code</a>
+      Made by <a class="text-indigo-600" target="_blank" href="https://www.github.com/hsek">Sek Un</a> 
+      • <a class="text-indigo-600" target="_blank" href="https://www.github.com/hsek/fen_gen">Source code</a>
       • Dataset from Pavel Koryakin @
       <a class="text-indigo-600" target="_blank" href="https://www.kaggle.com/koryakinp/chess-positions">Kaggle</a>
     </p>
